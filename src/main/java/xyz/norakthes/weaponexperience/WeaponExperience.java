@@ -71,9 +71,14 @@ public final class WeaponExperience extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onCraftItem(CraftItemEvent event){
+        item = event.getCurrentItem();
+        if (item.getType() == Material.DIAMOND_SWORD){
+            nbti.setInteger("Experience",xp);
+            lore = nbti.getInteger("Experience");
+            item.setLore(Collections.singletonList("Experience: " + lore));
+            item = nbti.getItem();
+        }
 
-        item.setLore(Collections.singletonList("Experience: " + lore));
-        item = nbti.getItem();
     }
 
 }
