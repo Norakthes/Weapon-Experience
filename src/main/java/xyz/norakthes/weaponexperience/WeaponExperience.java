@@ -25,8 +25,6 @@ public final class WeaponExperience extends JavaPlugin implements Listener{
     NBTItem nbti = new NBTItem(item);
     Integer lore;
 
-
-
     @Override
     public void onEnable() {
         try {
