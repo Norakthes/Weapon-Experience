@@ -60,6 +60,7 @@ public final class WeaponExperience extends JavaPlugin implements Listener {
         item = event.getPlayer().getItemInHand();
         nbti.setInteger("Experience",xp);
         lore = nbti.getInteger("Experience");
+        xp = lore;
         item.setLore(Collections.singletonList("Experience: " + lore));
         xp++;
         item = nbti.getItem();
