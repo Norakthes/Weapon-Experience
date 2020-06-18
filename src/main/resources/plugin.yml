@@ -5,3 +5,5 @@ api-version: 1.13
 authors: [Norakthes]
 description: Are you tired of the dissatisfaction of using the same weapon over and over, and getting nothing out of it? Then this plugin is for you! This plugin implements *Weapon Experience* making your weapon stronger the more you use it.
 website: Norakthes.xyz
+commands:
+  nbt:
