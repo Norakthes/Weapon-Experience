@@ -12,9 +12,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.MainHand;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -36,6 +38,7 @@ public final class WeaponExperience extends JavaPlugin implements Listener{
 
     @Override
     public void onEnable() {
+        this.getCommand("nbt").setExecutor(new nbt());
         try {
             NBTFile file = new NBTFile(new File(getDataFolder(), "test.nbt"));
             nbti.setInteger("Experience",0);
@@ -63,19 +66,17 @@ public final class WeaponExperience extends JavaPlugin implements Listener{
 
     @EventHandler
     public void onBlockBreakEvent(BlockBreakEvent event){
-        ItemStack itemInHand = event.getPlayer().getInventory().getItemInMainHand();
-        nbti = new NBTItem(itemInHand);
-//        nbti.setInteger("Experience",xp);
-//        lore = nbti.getInteger("Experience");
-//        xp = lore;
-//        item.setLore(Collections.singletonList("Experience: " + lore));
-//        xp++;
-//        item = nbti.getItem();
-//        String nbt = nbtItem.getString("Test");
-        if (nbti.getInteger("Experience") != null){
-            Bukkit.broadcastMessage("Yeet" + nbti.getInteger("Experience"));
-
-        }
+        Player player = event.getPlayer();
+        ItemStack mainHand = player.getInventory().getItemInMainHand();
+        NBTItem nbtItem = new NBTItem(mainHand);
+        Integer experience = nbtItem.getInteger("Experience");
+        Bukkit.broadcastMessage(String.valueOf(nbtItem.getInteger("Experience")));
+        boolean hasNBT = experience != null;
+            experience++;
+            nbtItem.setInteger("Experience",experience);
+            mainHand = nbtItem.getItem();
+//        Bukkit.broadcastMessage(String.valueOf(itemInMainHand));
+            Bukkit.broadcastMessage(String.valueOf(experience));
 
 
     }
