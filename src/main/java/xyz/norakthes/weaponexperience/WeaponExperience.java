@@ -71,14 +71,14 @@ public final class WeaponExperience extends JavaPlugin implements Listener{
         NBTItem nbtItem = new NBTItem(mainHand);
         Integer experience = nbtItem.getInteger("Experience");
         Bukkit.broadcastMessage(String.valueOf(nbtItem.getInteger("Experience")));
-        boolean hasNBT = experience != null;
+        boolean hasNBT = nbtItem.hasKey("Experience");
+        if (hasNBT) {
             experience++;
-            nbtItem.setInteger("Experience",experience);
+            nbtItem.setInteger("Experience", experience);
             mainHand = nbtItem.getItem();
-//        Bukkit.broadcastMessage(String.valueOf(itemInMainHand));
+            player.getInventory().setItemInMainHand(mainHand);
             Bukkit.broadcastMessage(String.valueOf(experience));
-
-
+        }
     }
 
     @EventHandler
