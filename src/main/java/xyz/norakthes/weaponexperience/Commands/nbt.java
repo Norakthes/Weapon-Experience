@@ -1,4 +1,4 @@
-package xyz.norakthes.weaponexperience;
+package xyz.norakthes.weaponexperience.Commands;
 
 import de.tr7zw.changeme.nbtapi.NBTFile;
 import de.tr7zw.changeme.nbtapi.NBTItem;
@@ -12,6 +12,8 @@ import org.bukkit.inventory.MainHand;
 
 import java.io.File;
 import java.io.IOException;
+
+import static xyz.norakthes.weaponexperience.WeaponExperience.myInventory;
 
 public class nbt implements CommandExecutor{
     //  Debug
