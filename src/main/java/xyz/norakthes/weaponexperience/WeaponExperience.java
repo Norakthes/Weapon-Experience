@@ -1,6 +1,7 @@
 package xyz.norakthes.weaponexperience;
 
-import de.tr7zw.changeme.nbtapi.*;
+import de.tr7zw.changeme.nbtapi.NBTFile;
+import de.tr7zw.changeme.nbtapi.NBTItem;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -9,38 +10,68 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
+import xyz.norakthes.weaponexperience.Commands.inv;
+import xyz.norakthes.weaponexperience.Commands.nbt;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
 
 public final class WeaponExperience extends JavaPlugin implements Listener{
-    ItemStack item = new ItemStack(Material.DIAMOND_SWORD,1);
-    ItemMeta itemMeta = item.getItemMeta();
-    NBTItem nbti = new NBTItem(item);
-    Integer lore;
+    ItemStack sword = new ItemStack(Material.DIAMOND_SWORD,1);
+    ItemStack book = new ItemStack(Material.BOOK,1);
+    NBTItem swordNBT = new NBTItem(sword);
+    NBTItem bookNBT = new NBTItem(book);
+
+    public static Inventory myInventory = Bukkit.createInventory(null, 9, "Test Inventory");
+
+    static {
+        myInventory.setItem(0, new ItemStack(Material.DIRT,1));
+        myInventory.setItem(8, new ItemStack(Material.GOLD_BLOCK, 1));
+    }
 
     @Override
     public void onEnable() {
         try {
             NBTFile file = new NBTFile(new File(getDataFolder(), "test.nbt"));
-            nbti.setInteger("Experience",0);
-            item = nbti.getItem();
-            file.save();
-            ShapedRecipe testRecipe = new ShapedRecipe(NamespacedKey.minecraft("test"), item);
-            ShapelessRecipe debug = new ShapelessRecipe(NamespacedKey.minecraft("yes"), item);
-            getServer().getPluginManager().registerEvents(this, this);
-            debug.addIngredient(Material.DIAMOND);
+
+            //Gives NBT to crafting items
+            swordNBT.setInteger("Experience",0);
+
+
+            //Initializes NBT to crafted items
+            sword = swordNBT.getItem();
+            book = bookNBT.getItem();
+
+
+            //Crafting recipes
+            ShapedRecipe testRecipe = new ShapedRecipe(NamespacedKey.minecraft("test"), sword);
+            ShapelessRecipe debug = new ShapelessRecipe(NamespacedKey.minecraft("yes"), sword);
+
+            //Crafting recipe shapes
+            // Sword
             testRecipe.shape(" * ", " * ", " % ");
             testRecipe.setIngredient('*', Material.DIAMOND);
             testRecipe.setIngredient('%', Material.STICK);
+
+            // Debug recipe
+            debug.addIngredient(Material.DIAMOND);
+
+            //Add recipes to server
             getServer().addRecipe(debug);
             getServer().addRecipe(testRecipe);
+
+            //Commands
+            this.getCommand("nbt").setExecutor(new nbt());
+            this.getCommand("inv").setExecutor(new inv());
+
+            file.save();
+            getServer().getPluginManager().registerEvents(this, this);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -51,29 +82,22 @@ public final class WeaponExperience extends JavaPlugin implements Listener{
         // Plugin shutdown logic
     }
 
-
     @EventHandler
     public void onBlockBreakEvent(BlockBreakEvent event){
-        ItemStack itemInHand = event.getPlayer().getInventory().getItemInMainHand();
-        nbti = new NBTItem(itemInHand);
-//        nbti.setInteger("Experience",xp);
-//        lore = nbti.getInteger("Experience");
-//        xp = lore;
-//        item.setLore(Collections.singletonList("Experience: " + lore));
-//        xp++;
-//        item = nbti.getItem();
-//        String nbt = nbtItem.getString("Test");
-        if (nbti.getInteger("Experience") != null){
-            Bukkit.broadcastMessage("Yeet" + nbti.getInteger("Experience"));
-
+        Player player = event.getPlayer();
+        if (!event.getPlayer().getInventory().getItemInMainHand().equals(new ItemStack(Material.AIR,0))){
+            ItemStack mainHand = player.getInventory().getItemInMainHand();
+            NBTItem nbtItem = new NBTItem(mainHand);
+            Integer experience = nbtItem.getInteger("Experience");
+            Bukkit.broadcastMessage(String.valueOf(nbtItem.getInteger("Experience")));
+            boolean hasNBT = nbtItem.hasKey("Experience");
+            if (hasNBT) {
+                experience++;
+                nbtItem.setInteger("Experience", experience);
+                mainHand = nbtItem.getItem();
+                player.getInventory().setItemInMainHand(mainHand);
+                Bukkit.broadcastMessage(String.valueOf(experience));
+            }
         }
-
-
     }
-
-    @EventHandler
-    public void onCraftItem(CraftItemEvent event){
-
-    }
-
 }
