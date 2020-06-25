@@ -7,5 +7,5 @@ description: Are you tired of the dissatisfaction of using the same weapon over 
 website: Norakthes.xyz
 commands:
   nbt:
-  info:
   inv:
+  exp:
