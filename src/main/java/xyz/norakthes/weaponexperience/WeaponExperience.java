@@ -1,25 +1,22 @@
 package xyz.norakthes.weaponexperience;
 
-import com.sun.tools.javac.code.Attribute;
-import de.tr7zw.changeme.nbtapi.NBTCompoundList;
 import de.tr7zw.changeme.nbtapi.NBTFile;
 import de.tr7zw.changeme.nbtapi.NBTItem;
+import de.tr7zw.changeme.nbtapi.NBTListCompound;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.inventory.CraftItemEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.plugin.java.JavaPlugin;
 import xyz.norakthes.weaponexperience.Commands.exp;
+import xyz.norakthes.weaponexperience.Commands.getNBT;
 import xyz.norakthes.weaponexperience.Commands.inv;
 import xyz.norakthes.weaponexperience.Commands.nbt;
 
@@ -35,9 +32,9 @@ public final class WeaponExperience extends JavaPlugin implements Listener{
     NBTItem bookNBT = new NBTItem(book);
 
 
-    public static List<ItemStack> itemList = new ArrayList<>();
+    public static final List<Material> itemList = new ArrayList<>();
     static {
-        itemList.add(new ItemStack(Material.DIAMOND_SWORD));
+        itemList.add(Material.DIAMOND_SWORD);
     }
 
     public static Inventory myInventory = Bukkit.createInventory(null, 9, "Test Inventory");
@@ -81,6 +78,7 @@ public final class WeaponExperience extends JavaPlugin implements Listener{
             this.getCommand("nbt").setExecutor(new nbt());
             this.getCommand("inv").setExecutor(new inv());
             this.getCommand("exp").setExecutor(new exp());
+            this.getCommand("getNBT").setExecutor(new getNBT());
 
             file.save();
             getServer().getPluginManager().registerEvents(this, this);
@@ -97,25 +95,25 @@ public final class WeaponExperience extends JavaPlugin implements Listener{
     @EventHandler
     public void onBlockBreakEvent(BlockBreakEvent event){
         Player player = event.getPlayer();
-        if (!event.getPlayer().getInventory().getItemInMainHand().equals(new ItemStack(Material.AIR)) && event.getPlayer().getInventory().getItemInMainHand().equals(itemList)){
+        if (!event.getPlayer().getInventory().getItemInMainHand().equals(new ItemStack(Material.AIR))) { //Checks if mainhand is not air
             ItemStack mainHand = player.getInventory().getItemInMainHand();
-            NBTItem nbtItem = new NBTItem(mainHand);
-            Integer experience = nbtItem.getInteger("Experience");
-            Bukkit.broadcastMessage(String.valueOf(nbtItem.getInteger("Experience")));
-            boolean hasNBT = nbtItem.hasKey("Experience");
-            if (!hasNBT) {
-                nbtItem.setInteger("Experience", 1);
+            if (itemList.contains(mainHand.getType())) {
+                NBTItem nbti = new NBTItem(mainHand);
+                NBTListCompound attribute = nbti.getCompoundList("AttributeModifiers").addCompound();
+                attribute.setString("Name","generic.attackSpeed");
+                attribute.setDouble("Base",0.5);
+                Integer experience = nbti.getInteger("Experience");
+                boolean hasNBT = nbti.hasKey("Experience");
+                if (!hasNBT) {
+                    nbti.setInteger("Experience", 1);
+                }
+                if (hasNBT) {
+                    experience++;
+                    nbti.setInteger("Experience", experience);
+                }
+                mainHand = nbti.getItem();
+                player.getInventory().setItemInMainHand(mainHand);
             }
-            if (hasNBT) {
-                experience++;
-                nbtItem.setInteger("Experience", experience);
-
-                Bukkit.broadcastMessage(String.valueOf(experience));
-            }
-            mainHand = nbtItem.getItem();
-            player.getInventory().setItemInMainHand(mainHand);
-            NBTCompoundList compoundList = nbtItem.getCompoundList("Attributes");
-            Bukkit.broadcastMessage(String.valueOf(compoundList));
         }
     }
 }

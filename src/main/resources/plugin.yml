@@ -9,3 +9,5 @@ commands:
   nbt:
   inv:
   exp:
+  getNBT:
+    aliases: gnbt
